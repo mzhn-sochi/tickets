@@ -65,5 +65,6 @@ func (h *statusHandler) Handle(msg *nats.Msg) {
 		log.Println(s, err)
 		return
 	}
+
 	log.Printf("tx: %s status successfully changed to %s\n", ticketId, s)
 }

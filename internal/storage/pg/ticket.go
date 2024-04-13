@@ -107,3 +107,13 @@ func (t *TicketStorage) PatchStatus(id string, status string) error {
 
 	return err
 }
+
+func (t *TicketStorage) AppendError(ticketId string, reason string) error {
+	_, err := t.db.Exec(
+		fmt.Sprintf("insert into %s (ticket_id, reason) values ($1, $2)", REJECTION_REASONS_TABLE),
+		ticketId,
+		reason,
+	)
+
+	return err
+}

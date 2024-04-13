@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/nats-io/nats.go"
 	"log"
+	"strings"
 	ticketservice "tickets/internal/service/ticket-service"
 )
 
@@ -16,9 +17,8 @@ type errorHandler struct {
 }
 
 type errorReq struct {
-	TicketId string `json:"ticket_id"`
-	Type     string `json:"type"`
-	Reason   string `json:"reason"`
+	Type   string `json:"type"`
+	Reason string `json:"reason"`
 }
 
 func NewErrorHandler(storage ticketservice.TicketStorage) ErrorHandler {
@@ -32,5 +32,21 @@ func (h *errorHandler) Handle(msg *nats.Msg) {
 		log.Printf("error while unmarshalling error data %v\n", err)
 		return
 	}
-	// TODO: Доделать ошибки
+
+	ticketId := strings.TrimSpace(msg.Header.Get("ticket_id"))
+	if ticketId == "" {
+		log.Printf("empty ticket id\n")
+		return
+	}
+
+	// TODO: Переделать статус
+	if err := h.storage.PatchStatus(ticketId, "rejected"); err != nil {
+		log.Println("cannot change status to rejected")
+		return
+	}
+
+	if err := h.storage.AppendError(ticketId, data.Reason); err != nil {
+		log.Println("cannot append error to ticket")
+		return
+	}
 }

@@ -17,6 +17,7 @@ type TicketStorage interface {
 	Find(id string) (*entity.Ticket, error)
 	List(filter *entity.Filter) ([]*entity.Ticket, int64, error)
 	PatchStatus(id string, status string) error
+	AppendError(ticketId string, reason string) error
 }
 
 type TicketService struct {

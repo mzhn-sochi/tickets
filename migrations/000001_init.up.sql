@@ -16,7 +16,7 @@ CREATE FUNCTION get_ticket_status(ticket_id TEXT) RETURNS statuses AS
 $$
 BEGIN
     RETURN (SELECT status
-            FROM tickets
+            FROM ticket
             WHERE id = ticket_id);
 END
 $$ LANGUAGE plpgsql;
