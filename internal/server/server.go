@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strings"
 	"tickets/api/share"
 	"tickets/api/ts"
 	"tickets/internal/entity"
@@ -115,6 +116,7 @@ func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListRes
 			ImageUrl:    t.ImageUrl,
 			ShopAddress: t.ShopAddress,
 			CreatedAt:   t.CreatedAt.Unix(),
+			Status:      ts.Statuses(ts.Statuses_value[strings.ToUpper(t.Status)]),
 		}
 
 		if t.UpdatedAt != nil {

@@ -14,8 +14,7 @@ RUN apk update --no-cache
 WORKDIR /app
 COPY --from=builder /usr/local/go/src/app /app
 
-#ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait /app/wait
-#RUN chmod +x /app/wait
-#
-#CMD  ./wait && ./app
-CMD ./app
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait /app/wait
+RUN chmod +x /app/wait
+
+CMD  ./wait && ./app

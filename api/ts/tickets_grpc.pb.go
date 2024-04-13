@@ -7,11 +7,11 @@
 package ts
 
 import (
+	share "tickets/api/share"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	share "tickets/api/share"
 )
 
 // This is a compile-time assertion to ensure that this generated file
