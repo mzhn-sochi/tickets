@@ -14,6 +14,7 @@ import (
 	"tickets/internal/config"
 	"tickets/internal/events"
 	"tickets/internal/server"
+	"tickets/internal/service/analytics"
 	"tickets/internal/service/ticket-service"
 	"tickets/internal/storage/pg"
 )
@@ -39,7 +40,8 @@ func Init() (*App, func(), error) {
 		return nil, nil, err
 	}
 	ticketService := ticketservice.New(ticketStorage, messageBroker, configConfig)
-	serverServer := server.New(ticketService)
+	analyticsAnalytics := analytics.New(ticketStorage)
+	serverServer := server.New(ticketService, analyticsAnalytics)
 	app := newApp(configConfig, serverServer, messageBroker)
 	return app, func() {
 		cleanup2()

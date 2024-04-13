@@ -7,7 +7,7 @@ build:
 
 gen:
 	protoc --go_out=. --go-grpc_out=. \
-		-I ./proto ./proto/share.proto ./proto/tickets.proto
+		-I ./proto ./proto/tickets.proto
 	wire ./internal/app
 
 deploy:
