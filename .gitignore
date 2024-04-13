@@ -1,7 +1,5 @@
 .idea
 bin/
 
-api/ 
-wire_gen.go
 
 *.env.*
