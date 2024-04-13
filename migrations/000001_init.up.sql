@@ -1,6 +1,5 @@
 CREATE TYPE statuses AS ENUM ('waiting_ocr', 'waiting_validation', 'waiting_approval', 'closed','rejected');
 
-
 CREATE TABLE ticket
 (
     id           TEXT PRIMARY KEY,
@@ -10,6 +9,17 @@ CREATE TABLE ticket
     image_url    TEXT      NOT NULL,
     updated_at   TIMESTAMP,
     status       statuses  NOT NULL DEFAULT 'waiting_ocr'
+);
+
+CREATE TABLE tickets_item
+(
+    ticket_id   TEXT    not null unique references ticket (id) on delete cascade,
+    product     TEXT    not null,
+    description TEXT    not null,
+    price       decimal not null,
+    amount      int     not null,
+    unit        TEXT    not null,
+    overprice   decimal
 );
 
 CREATE FUNCTION get_ticket_status(ticket_id TEXT) RETURNS statuses AS

@@ -18,7 +18,7 @@ type errorHandler struct {
 
 type errorReq struct {
 	Type   string `json:"type"`
-	Reason string `json:"reason"`
+	Reason string `json:"message"`
 }
 
 func NewErrorHandler(storage ticketservice.TicketStorage) ErrorHandler {
@@ -46,7 +46,7 @@ func (h *errorHandler) Handle(msg *nats.Msg) {
 	}
 
 	if err := h.storage.AppendError(ticketId, data.Reason); err != nil {
-		log.Println("cannot append error to ticket")
+		log.Println("cannot append error to ticket ", err)
 		return
 	}
 }

@@ -109,6 +109,7 @@ func (t *TicketStorage) PatchStatus(id string, status string) error {
 }
 
 func (t *TicketStorage) AppendError(ticketId string, reason string) error {
+	log.Println("reason: ", reason)
 	_, err := t.db.Exec(
 		fmt.Sprintf("insert into %s (ticket_id, reason) values ($1, $2)", REJECTION_REASONS_TABLE),
 		ticketId,
