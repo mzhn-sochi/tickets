@@ -8,7 +8,7 @@ import (
 
 type MessageBroker interface {
 	Consume(handler, errHandler MessageBrokerHandler) error
-	Publish(queue string, data []byte) error
+	Publish(msg *nats.Msg) error
 	Close()
 }
 
@@ -60,8 +60,8 @@ func (m *messageBroker) subscribe(channel string, handler MessageBrokerHandler, 
 	}
 }
 
-func (m *messageBroker) Publish(queue string, data []byte) error {
-	return m.conn.Publish(queue, data)
+func (m *messageBroker) Publish(msg *nats.Msg) error {
+	return m.conn.PublishMsg(msg)
 }
 
 func (m *messageBroker) Close() {

@@ -58,8 +58,6 @@ func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListRes
 
 			var st entity.Status
 			switch *request.Filter.Status {
-			case ts.Statuses_PENDING:
-				st = entity.StatusPending
 			case ts.Statuses_WAITING_OCR:
 				st = entity.StatusWaitingOcr
 			case ts.Statuses_WAITING_VALIDATION:

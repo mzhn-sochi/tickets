@@ -3,6 +3,7 @@ package ticketservice
 import (
 	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/nats-io/nats.go"
 	"tickets/internal/broker"
 	"tickets/internal/config"
 	"tickets/internal/entity"
@@ -36,9 +37,8 @@ func (t *TicketService) Create(ticket *entity.Ticket) error {
 	}
 
 	req := struct {
-		TicketId string `json:"ticket_id"`
 		ImageUrl string `json:"image_url"`
-	}{ImageUrl: ticket.ImageUrl, TicketId: id.String()}
+	}{ImageUrl: ticket.ImageUrl}
 
 	var data []byte
 	if data, err = json.Marshal(req); err != nil {
@@ -46,7 +46,12 @@ func (t *TicketService) Create(ticket *entity.Ticket) error {
 	}
 
 	ticket.Id = id.String()
-	if err := t.mb.Publish(t.cfg.Nats.Queues.OCR, data); err != nil {
+	if err := t.mb.Publish(
+		&nats.Msg{
+			Subject: t.cfg.Nats.Queues.OCR,
+			Header:  map[string][]string{"ticket_id": {id.String()}},
+			Data:    data,
+		}); err != nil {
 		return err
 	}
 

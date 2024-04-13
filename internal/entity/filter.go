@@ -3,8 +3,7 @@ package entity
 import "fmt"
 
 const (
-	StatusPending = iota
-	StatusWaitingOcr
+	StatusWaitingOcr = iota
 	StatusWaitingValidation
 	StatusWaitingApproval
 	StatusClosed
@@ -15,8 +14,6 @@ type Status int8
 
 func (s Status) String() (string, error) {
 	switch s {
-	case StatusPending:
-		return "pending", nil
 	case StatusWaitingOcr:
 		return "waiting_ocr", nil
 	case StatusWaitingValidation:

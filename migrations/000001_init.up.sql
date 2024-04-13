@@ -1,4 +1,4 @@
-CREATE TYPE statuses AS ENUM ('pending', 'waiting_ocr', 'waiting_validation', 'waiting_approval', 'closed','rejected');
+CREATE TYPE statuses AS ENUM ('waiting_ocr', 'waiting_validation', 'waiting_approval', 'closed','rejected');
 
 
 CREATE TABLE ticket
@@ -9,7 +9,7 @@ CREATE TABLE ticket
     created_at   TIMESTAMP NOT NULL DEFAULT NOW(),
     image_url    TEXT      NOT NULL,
     updated_at   TIMESTAMP,
-    status       statuses  NOT NULL DEFAULT 'pending'
+    status       statuses  NOT NULL DEFAULT 'waiting_ocr'
 );
 
 CREATE FUNCTION get_ticket_status(ticket_id TEXT) RETURNS statuses AS
