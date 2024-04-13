@@ -1,0 +1,26 @@
+version: '4.5'
+services:
+  app:
+    container_name: ticket-service
+    build:
+      context: .
+    env_file:
+      - .env.prod
+    environment:
+      WAIT_HOSTS: postgres:5432
+    ports:
+      - "50052:8080"
+
+  postgres:
+    image: postgres:13.14-alpine3.19
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env.pg
+    ports:
+      - "5434:5432"
+
+
+volumes:
+  pgdata:
