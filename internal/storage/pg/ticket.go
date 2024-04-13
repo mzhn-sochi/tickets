@@ -17,11 +17,13 @@ func NewTicketStorage(db *sqlx.DB) *TicketStorage {
 }
 
 func (t *TicketStorage) Create(ticket *entity.Ticket) error {
+
 	return t.db.Get(
 		ticket,
-		fmt.Sprintf("INSERT INTO %s(id, user_id, shop_address, image_url) VALUES ($1, $2, $3, $4) RETURNING *", TICKET_TABLE),
+		fmt.Sprintf("INSERT INTO %s(id, user_id, shop_name, shop_address, image_url) VALUES ($1, $2, $3, $4, $5) RETURNING *", TICKET_TABLE),
 		ticket.Id,
 		ticket.UserId,
+		ticket.ShopName,
 		ticket.ShopAddress,
 		ticket.ImageUrl,
 	)

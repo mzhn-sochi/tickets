@@ -1,0 +1,2 @@
+ALTER TABLE ticket
+    ADD COLUMN shop_name TEXT NOT NULL DEFAULT '';
