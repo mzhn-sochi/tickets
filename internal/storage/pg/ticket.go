@@ -31,11 +31,20 @@ func (t *TicketStorage) Find(id string) (*entity.Ticket, error) {
 
 	ticket := new(entity.Ticket)
 
-	if err := t.db.Get(
-		ticket,
-		fmt.Sprintf("SELECT * FROM %s WHERE id = $1 LIMIT 1", TICKET_TABLE),
-		id,
-	); err != nil {
+	query, args, err := squirrel.Select(fmt.Sprintf("%s.*, %s.reason", TICKET_TABLE, REJECTION_REASONS_TABLE)).
+		From(TICKET_TABLE).
+		Limit(1).
+		Where(squirrel.Eq{"id": id}).
+		OrderBy("created_at DESC").
+		LeftJoin(REJECTION_REASONS_TABLE).
+		JoinClause(fmt.Sprintf("ON %s.ticket_id = %s.id", REJECTION_REASONS_TABLE, TICKET_TABLE)).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := t.db.Get(ticket, query, args...); err != nil {
 		return nil, err
 	}
 
