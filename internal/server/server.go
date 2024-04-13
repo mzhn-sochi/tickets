@@ -33,6 +33,7 @@ func (s *Server) Create(ctx context.Context, request *ts.CreateRequest) (*ts.Cre
 		UserId:      request.UserId,
 		ShopAddress: request.ShopAddr,
 		ImageUrl:    request.ImageUrl,
+		ShopName:    request.ShopName,
 	}
 
 	if err := s.service.Create(ticket); err != nil {
