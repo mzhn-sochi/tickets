@@ -10,9 +10,6 @@ services:
       WAIT_HOSTS: postgres:5432
     ports:
       - "50052:8080"
-    networks:
-      - default
-      - main
 
   postgres:
     image: postgres:13.14-alpine3.19
@@ -23,14 +20,7 @@ services:
       - .env.pg
     ports:
       - "5434:5432"
-    networks:
-      - default
 
-networks:
-  default:
-    external: false
-  main:
-    external: true
 
 volumes:
   pgdata:

@@ -45,11 +45,13 @@ func (t *TicketStorage) Find(id string) (*entity.Ticket, error) {
 func (t *TicketStorage) List(filter *entity.Filter) ([]*entity.Ticket, int64, error) {
 	tt := make([]*entity.Ticket, 0)
 
-	query := squirrel.Select("*").
+	query := squirrel.Select(fmt.Sprintf("%s.*, %s.reason", TICKET_TABLE, REJECTION_REASONS_TABLE)).
 		From(TICKET_TABLE).
 		Limit(filter.Limit).
 		Offset(filter.Offset).
 		OrderBy("created_at DESC").
+		LeftJoin(REJECTION_REASONS_TABLE).
+		JoinClause(fmt.Sprintf("ON %s.ticket_id = %s.id", REJECTION_REASONS_TABLE, TICKET_TABLE)).
 		PlaceholderFormat(squirrel.Dollar)
 
 	if filter != nil {
@@ -99,13 +101,22 @@ func (t *TicketStorage) List(filter *entity.Filter) ([]*entity.Ticket, int64, er
 }
 
 func (t *TicketStorage) PatchStatus(id string, status string) error {
-	_, err := t.db.Exec(
-		fmt.Sprintf("UPDATE %s SET status = $1 WHERE id = $2", TICKET_TABLE),
-		status,
-		id,
-	)
 
-	return err
+	query, args, err := squirrel.Update(TICKET_TABLE).
+		Set("status", status).
+		Set("updated_at", squirrel.Expr("now()")).
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to create sql query: %w", err)
+	}
+
+	if _, err := t.db.Exec(query, args...); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (t *TicketStorage) AppendError(ticketId string, reason string) error {

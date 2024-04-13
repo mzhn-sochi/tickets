@@ -43,6 +43,7 @@ func (s *Server) Create(ctx context.Context, request *ts.CreateRequest) (*ts.Cre
 		TicketId: ticket.Id,
 	}, nil
 }
+
 func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListResponse, error) {
 
 	filter := new(entity.Filter)
@@ -117,6 +118,7 @@ func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListRes
 			ShopAddress: t.ShopAddress,
 			CreatedAt:   t.CreatedAt.Unix(),
 			Status:      ts.Statuses(ts.Statuses_value[strings.ToUpper(t.Status)]),
+			Reason:      t.Reason,
 		}
 
 		if t.UpdatedAt != nil {
@@ -132,20 +134,30 @@ func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListRes
 		Count:   count,
 	}, nil
 }
+
 func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts.Ticket, error) {
 	ticket, err := s.service.Find(request.TicketId)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ts.Ticket{
+	t := &ts.Ticket{
 		Id:          ticket.Id,
 		UserId:      ticket.UserId,
 		ImageUrl:    ticket.ImageUrl,
 		ShopAddress: ticket.ShopAddress,
 		CreatedAt:   ticket.CreatedAt.Unix(),
-	}, nil
+		Reason:      ticket.Reason,
+	}
+
+	if ticket.UpdatedAt != nil {
+		t.UpdatedAt = new(int64)
+		*t.UpdatedAt = ticket.UpdatedAt.Unix()
+	}
+
+	return t, nil
 }
+
 func (s *Server) CloseTicket(ctx context.Context, request *ts.CloseTicketRequest) (*share.Empty, error) {
 	if err := s.service.PatchStatus(request.TicketId, entity.StatusClosed); err != nil {
 		return nil, err
