@@ -147,6 +147,7 @@ func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts
 		ImageUrl:    ticket.ImageUrl,
 		ShopAddress: ticket.ShopAddress,
 		CreatedAt:   ticket.CreatedAt.Unix(),
+		Status:      ts.Statuses(ts.Statuses_value[strings.ToUpper(ticket.Status)]),
 		Reason:      ticket.Reason,
 	}
 
