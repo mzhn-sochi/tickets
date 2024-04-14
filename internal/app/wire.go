@@ -13,6 +13,7 @@ import (
 	"tickets/internal/config"
 	"tickets/internal/events"
 	"tickets/internal/server"
+	"tickets/internal/service/analytics"
 	ticketservice "tickets/internal/service/ticket-service"
 	"tickets/internal/storage/pg"
 )
@@ -30,6 +31,10 @@ func Init() (*App, func(), error) {
 
 			wire.NewSet(pg.NewTicketStorage),
 			wire.NewSet(ticketservice.New),
+
+			wire.NewSet(analytics.New),
+			wire.Bind(new(analytics.Summary), new(*pg.TicketStorage)),
+			wire.Bind(new(server.SummaryService), new(*analytics.Analytics)),
 
 			wire.Bind(new(server.TicketService), new(*ticketservice.TicketService)),
 			wire.Bind(new(ticketservice.TicketStorage), new(*pg.TicketStorage)),

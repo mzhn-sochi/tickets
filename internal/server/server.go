@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"strings"
-	"tickets/api/share"
 	"tickets/api/ts"
 	"tickets/internal/entity"
 )
@@ -17,14 +16,22 @@ type TicketService interface {
 	PatchStatus(id string, status entity.Status) error
 }
 
+type SummaryService interface {
+	UserSummary() (map[string]int64, error)
+	ShopSummary() (map[string]int64, error)
+	StatusSummary() (map[string]int64, error)
+}
+
 type Server struct {
 	service TicketService
+	summary SummaryService
 	ts.UnimplementedTicketServiceServer
 }
 
-func New(service TicketService) *Server {
+func New(service TicketService, summary SummaryService) *Server {
 	return &Server{
 		service: service,
+		summary: summary,
 	}
 }
 
@@ -162,10 +169,10 @@ func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts
 	return t, nil
 }
 
-func (s *Server) CloseTicket(ctx context.Context, request *ts.CloseTicketRequest) (*share.Empty, error) {
+func (s *Server) CloseTicket(ctx context.Context, request *ts.CloseTicketRequest) (*ts.Empty, error) {
 	if err := s.service.PatchStatus(request.TicketId, entity.StatusClosed); err != nil {
 		return nil, err
 	}
 
-	return &share.Empty{}, nil
+	return &ts.Empty{}, nil
 }
