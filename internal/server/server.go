@@ -6,6 +6,7 @@ import (
 	"errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 	"strings"
 	"tickets/api/ts"
 	"tickets/internal/entity"
@@ -168,6 +169,7 @@ func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts
 		Reason:      ticket.Reason,
 	}
 	if ticket.Item != nil {
+		log.Println("ticket.item != nil", ticket.Item)
 		t.Item = &ts.Item{
 			Unit:        ticket.Item.Measure.Unit,
 			Overprice:   uint32(ticket.Item.Overprice),
