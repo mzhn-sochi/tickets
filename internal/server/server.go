@@ -172,11 +172,13 @@ func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts
 		log.Println("ticket.item != nil", ticket.Item)
 		t.Item = &ts.Item{
 			Unit:        ticket.Item.Measure.Unit,
-			Overprice:   uint32(ticket.Item.Overprice),
 			Amount:      float32(ticket.Item.Measure.Amount),
 			Price:       float32(ticket.Item.Price),
 			Product:     ticket.Item.Product,
 			Description: ticket.Item.Description,
+		}
+		if ticket.Item.Overprice != nil {
+			t.Item.Overprice = uint32(*ticket.Item.Overprice)
 		}
 	}
 

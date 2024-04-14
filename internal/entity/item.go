@@ -8,5 +8,5 @@ type Item struct {
 		Amount float64 `json:"amount" db:"amount"`
 		Unit   string  `json:"unit" db:"unit"`
 	} `json:"measure"`
-	Overprice uint `json:"overprice" db:"overprice"`
+	Overprice *uint `json:"overprice" db:"overprice"`
 }
