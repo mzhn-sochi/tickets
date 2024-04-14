@@ -7,7 +7,7 @@ import (
 )
 
 type MessageBroker interface {
-	Consume(handler, errHandler MessageBrokerHandler) error
+	Consume(statusHandler, overpriceHandler, itemHandler, errHandler MessageBrokerHandler) error
 	Publish(msg *nats.Msg) error
 	Close()
 }
@@ -32,10 +32,12 @@ func New(cfg *config.Config) (MessageBroker, error) {
 
 type MessageBrokerHandler func(msg *nats.Msg)
 
-func (m *messageBroker) Consume(handler, errHandler MessageBrokerHandler) error {
+func (m *messageBroker) Consume(statusHandler, overpriceHandler, itemHandler, errHandler MessageBrokerHandler) error {
 	errChan := make(chan error)
 	go m.subscribe(m.cfg.Nats.Queues.Errors, errHandler, errChan)
-	go m.subscribe(m.cfg.Nats.Queues.Status, handler, errChan)
+	go m.subscribe(m.cfg.Nats.Queues.Status, statusHandler, errChan)
+	go m.subscribe(m.cfg.Nats.Queues.Overprice, overpriceHandler, errChan)
+	go m.subscribe(m.cfg.Nats.Queues.Validation, itemHandler, errChan)
 
 	for err := range errChan {
 		return err

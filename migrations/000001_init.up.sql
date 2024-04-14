@@ -13,12 +13,12 @@ CREATE TABLE ticket
 
 CREATE TABLE tickets_item
 (
-    ticket_id   TEXT    not null unique references ticket (id) on delete cascade,
-    product     TEXT    not null,
-    description TEXT    not null,
-    price       decimal not null,
-    amount      int     not null,
-    unit        TEXT    not null,
+    ticket_id   TEXT not null unique references ticket (id) on delete cascade,
+    product     TEXT,
+    description TEXT,
+    price       decimal,
+    amount      int,
+    unit        TEXT,
     overprice   decimal
 );
 

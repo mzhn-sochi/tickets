@@ -18,6 +18,8 @@ type TicketStorage interface {
 	List(filter *entity.Filter) ([]*entity.Ticket, int64, error)
 	PatchStatus(id string, status string) error
 	AppendError(ticketId string, reason string) error
+	SetOverprice(ticketId string, overprice uint) error
+	AddItem(ticketId string, item *entity.Item) error
 }
 
 type TicketService struct {

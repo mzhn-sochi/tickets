@@ -2,6 +2,10 @@ package server
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"strings"
 	"tickets/api/ts"
 	"tickets/internal/entity"
@@ -147,6 +151,9 @@ func (s *Server) List(ctx context.Context, request *ts.ListRequest) (*ts.ListRes
 func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts.Ticket, error) {
 	ticket, err := s.service.Find(request.TicketId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "ticket not found")
+		}
 		return nil, err
 	}
 
@@ -159,6 +166,16 @@ func (s *Server) FindById(ctx context.Context, request *ts.FindByIdRequest) (*ts
 		CreatedAt:   ticket.CreatedAt.Unix(),
 		Status:      ts.Statuses(ts.Statuses_value[strings.ToUpper(ticket.Status)]),
 		Reason:      ticket.Reason,
+	}
+	if ticket.Item != nil {
+		t.Item = &ts.Item{
+			Unit:        ticket.Item.Measure.Unit,
+			Overprice:   uint32(ticket.Item.Overprice),
+			Amount:      float32(ticket.Item.Measure.Amount),
+			Price:       float32(ticket.Item.Price),
+			Product:     ticket.Item.Product,
+			Description: ticket.Item.Description,
+		}
 	}
 
 	if ticket.UpdatedAt != nil {

@@ -26,6 +26,7 @@ type Config struct {
 			Errors     string `env:"NATS_QUEUE_ERRORS" env-required:"true"`
 			Validation string `env:"NATS_QUEUE_VALIDATION" env-required:"true"`
 			Status     string `env:"NATS_QUEUE_STATUS" env-required:"true"`
+			Overprice  string `env:"NATS_QUEUE_OVERPRICE" env-required:"true"`
 		}
 	}
 }

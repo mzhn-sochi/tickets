@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
@@ -48,6 +49,13 @@ func (t *TicketStorage) Find(id string) (*entity.Ticket, error) {
 
 	if err := t.db.Get(ticket, query, args...); err != nil {
 		return nil, err
+	}
+
+	var item entity.Item
+	query = fmt.Sprintf("select ti.product, ti.description, ti.price, ti.amount, ti.unit, ti.overprice from %s ti where ti.ticket_id = $1 limit 1;", TICKETS_ITEM_TABLE)
+	err = t.db.QueryRow(query, id).Scan(&item.Product, &item.Description, &item.Price, &item.Measure.Amount, &item.Measure.Unit, &item.Overprice)
+	if err == nil {
+		ticket.Item = &item
 	}
 
 	return ticket, nil
@@ -137,6 +145,40 @@ func (t *TicketStorage) AppendError(ticketId string, reason string) error {
 		ticketId,
 		reason,
 	)
+
+	return err
+}
+
+func (t *TicketStorage) SetOverprice(ticketId string, overprice uint) error {
+	tx, err := t.db.BeginTx(context.Background(), nil)
+	if err != nil {
+		fmt.Println("cannot start tx")
+	}
+
+	var count int
+	if err := tx.QueryRow(`select count() from tickets_item where ticket_id=?;`, ticketId).Scan(&count); err != nil {
+		return err
+	}
+	if count > 0 {
+		query := fmt.Sprintf(`update tickets_item i set overprice=? where i.ticket_id=?;`)
+		_, err := tx.Exec(query, overprice, ticketId)
+		if err != nil {
+			return err
+		}
+	} else {
+		query := fmt.Sprintf(`insert into tickets_item(ticket_id, overprice) values (?, ?);`)
+		_, err := tx.Exec(query, ticketId, overprice)
+		if err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+func (t *TicketStorage) AddItem(ticketId string, item *entity.Item) error {
+	query := fmt.Sprintf(`insert into %s(ticket_id, product, description, price, amount, unit) values (?,?,?,?,?,?);`, TICKETS_ITEM_TABLE)
+	_, err := t.db.Exec(query, ticketId, item.Product, item.Description, item.Price, item.Measure.Amount, item.Measure.Unit)
 
 	return err
 }

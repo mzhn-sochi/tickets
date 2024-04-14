@@ -27,6 +27,8 @@ func Init() (*App, func(), error) {
 
 			wire.NewSet(events.NewStatusHandler),
 			wire.NewSet(events.NewErrorHandler),
+			wire.NewSet(events.NewItemHandler),
+			wire.NewSet(events.NewOverpriceHandler),
 			wire.NewSet(initBroker),
 
 			wire.NewSet(pg.NewTicketStorage),
@@ -71,6 +73,8 @@ func initDB(cfg *config.Config) (*sqlx.DB, func(), error) {
 
 func initBroker(cfg *config.Config,
 	statusHandler events.StatusHandler,
+	overpriceHandler events.OverpriceHandler,
+	itemHandler events.ItemHandler,
 	errorsHandler events.ErrorHandler) (broker.MessageBroker, func(), error) {
 	mb, err := broker.New(cfg)
 	if err != nil {
@@ -78,7 +82,10 @@ func initBroker(cfg *config.Config,
 	}
 
 	go func() {
-		if err := mb.Consume(statusHandler.Handle, errorsHandler.Handle); err != nil {
+		if err := mb.Consume(statusHandler.Handle,
+			overpriceHandler.Handle,
+			itemHandler.Handle,
+			errorsHandler.Handle); err != nil {
 			log.Println(err)
 			return
 		}

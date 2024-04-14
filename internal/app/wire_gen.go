@@ -33,8 +33,10 @@ func Init() (*App, func(), error) {
 	}
 	ticketStorage := pg.NewTicketStorage(db)
 	statusHandler := events.NewStatusHandler(ticketStorage)
+	overpriceHandler := events.NewOverpriceHandler(ticketStorage)
+	itemHandler := events.NewItemHandler(ticketStorage)
 	errorHandler := events.NewErrorHandler(ticketStorage)
-	messageBroker, cleanup2, err := initBroker(configConfig, statusHandler, errorHandler)
+	messageBroker, cleanup2, err := initBroker(configConfig, statusHandler, overpriceHandler, itemHandler, errorHandler)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -77,6 +79,8 @@ func initDB(cfg *config.Config) (*sqlx.DB, func(), error) {
 
 func initBroker(cfg *config.Config,
 	statusHandler events.StatusHandler,
+	overpriceHandler events.OverpriceHandler,
+	itemHandler events.ItemHandler,
 	errorsHandler events.ErrorHandler) (broker.MessageBroker, func(), error) {
 	mb, err := broker.New(cfg)
 	if err != nil {
@@ -84,7 +88,10 @@ func initBroker(cfg *config.Config,
 	}
 
 	go func() {
-		if err := mb.Consume(statusHandler.Handle, errorsHandler.Handle); err != nil {
+		if err := mb.Consume(statusHandler.Handle,
+			overpriceHandler.Handle,
+			itemHandler.Handle,
+			errorsHandler.Handle); err != nil {
 			log.Println(err)
 			return
 		}
