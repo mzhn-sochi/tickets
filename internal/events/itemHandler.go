@@ -36,6 +36,7 @@ func (h *itemHandler) Handle(msg *nats.Msg) {
 	}
 
 	if err := h.storage.AddItem(ticketId, &data); err != nil {
+		log.Println(err)
 		log.Printf("cannot add items to ticketId %s\n", ticketId)
 		return
 	}
