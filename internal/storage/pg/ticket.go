@@ -177,7 +177,7 @@ func (t *TicketStorage) SetOverprice(ticketId string, overprice uint) error {
 }
 
 func (t *TicketStorage) AddItem(ticketId string, item *entity.Item) error {
-	query := fmt.Sprintf(`insert into %s(ticket_id, product, description, price, amount, unit) values (?,?,?,?,?,?);`, TICKETS_ITEM_TABLE)
+	query := fmt.Sprintf(`insert into %s(ticket_id, product, description, price, amount, unit) values ($1,$2,$3,$4,$5,$6);`, TICKETS_ITEM_TABLE)
 	_, err := t.db.Exec(query, ticketId, item.Product, item.Description, item.Price, item.Measure.Amount, item.Measure.Unit)
 
 	return err
